@@ -108,4 +108,17 @@ public class UserControllerTest {
                 .andReturn();
     }
 
+    @Test
+    public void testUserRegistrationShouldReturn401OnNonAlphaNumericUsername() throws Exception {
+        mockMvc.perform(post("/users")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("username", "user!%name;")
+                .param("email", "testemail@test.com")
+                .param("password", actualPassword))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("username")))
+                .andExpect(content().string(containsString("The username should contain only alphanumeric characters and underscores")))
+                .andReturn();
+    }
+
 }
