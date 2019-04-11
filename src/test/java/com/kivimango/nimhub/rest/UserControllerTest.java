@@ -121,4 +121,17 @@ public class UserControllerTest {
                 .andReturn();
     }
 
+    @Test
+    public void testUserRegistrationShouldReturn401OnNonValidEmailAddress() throws Exception {
+        mockMvc.perform(post("/users")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("username", actualUsername)
+                .param("email", "nonvalidemail@")
+                .param("password", actualPassword))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("email")))
+                .andExpect(content().string(containsString("The email address must be a valid RFC822 email address")))
+                .andReturn();
+    }
+
 }
