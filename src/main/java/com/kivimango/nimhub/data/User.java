@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -29,7 +30,7 @@ public class User extends DateAudit {
     private String password;
 
     @OneToMany(mappedBy = "owner")
-    private Set<Package> packages = Collections.emptySet();
+    private Set<Package> packages = new HashSet<>();
 
     private Boolean banned = false;
 
