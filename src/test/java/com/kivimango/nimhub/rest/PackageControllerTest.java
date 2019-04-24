@@ -19,8 +19,7 @@ import static com.kivimango.nimhub.rest.TestData.*;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(PackageController.class)
@@ -32,10 +31,10 @@ public class PackageControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private PackageDAO dao;
+    private PackageRepository dao;
 
     @MockBean
-    private PackageRepository repository;
+    private PackageStore repository;
 
     @MockBean
     private PackageService packages;
@@ -45,7 +44,7 @@ public class PackageControllerTest {
     @Test
     public void testUploadPackageShouldReturn201() throws Exception {
         MockMultipartFile packageFile = new MockMultipartFile("package", "lib.tar.gz", "application/gzip", inputStream);
-        given(packages.save(Mockito.any(), Mockito.any())).willReturn(TestData.dto);
+        given(packages.save(Mockito.any(), Mockito.any(), Mockito.any())).willReturn(TestData.dto);
 
         mockMvc.perform(multipart("/packages")
                 .file("file", packageFile.getBytes())
@@ -57,12 +56,15 @@ public class PackageControllerTest {
                 .param("web", web)
                 .param("version", version))
                 .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.name", is(packageName)))
                 .andExpect(jsonPath("$.description", is(description)))
                 .andExpect(jsonPath("$.tags[0].tag", is(tag)))
                 .andExpect(jsonPath("$.license", is(license)))
                 .andExpect(jsonPath("$.web", is(web)))
                 .andExpect(jsonPath("$.version", is(version)))
+                .andExpect(jsonPath("$.hidden", is(false)))
+                .andExpect(jsonPath("$.owner.username", is(dto.getOwner().getUsername())))
                 .andReturn();
     }
 }
