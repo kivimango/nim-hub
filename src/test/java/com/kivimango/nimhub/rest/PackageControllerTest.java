@@ -2,6 +2,7 @@ package com.kivimango.nimhub.rest;
 
 import com.kivimango.nimhub.config.SecurityConfig;
 import com.kivimango.nimhub.data.*;
+import com.kivimango.nimhub.util.TestData;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -15,7 +16,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import java.io.InputStream;
-import static com.kivimango.nimhub.rest.TestData.*;
+import static com.kivimango.nimhub.util.TestData.*;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
