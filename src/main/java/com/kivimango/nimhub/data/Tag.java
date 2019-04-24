@@ -16,8 +16,30 @@ class Tag {
     @Column(name = "tag_name", unique = true, nullable = false)
     private String name;
 
-    private String password;
-
     @ManyToMany
     private Set<Package> packages = Collections.emptySet();
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Set<Package> getPackages() {
+        return packages;
+    }
+
+    public void setPackages(Set<Package> packages) {
+        this.packages = packages;
+    }
 }
