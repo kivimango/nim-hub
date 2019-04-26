@@ -21,7 +21,6 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
@@ -54,7 +53,7 @@ public class PackageControllerTest {
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .param("name", packageName)
                 .param("description", description)
-                .param("tagString", TestData.tag)
+                .param("tagsString", TestData.tag)
                 .param("license", license)
                 .param("web", web)
                 .param("version", version))
@@ -73,7 +72,7 @@ public class PackageControllerTest {
 
     @Test
     public void testUploadPackageShouldReturn401OnMandatoryFieldsOmittedValuesWithErrorMessages() throws Exception {
-        mockMvc.perform(post("/packages")
+        mockMvc.perform(multipart("/packages")
                 .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -86,6 +85,28 @@ public class PackageControllerTest {
                 .andExpect(content().string(containsString("You must supply a package description")))
                 .andExpect(content().string(containsString("version")))
                 .andExpect(content().string(containsString("You must supply a package version")))
+                .andReturn();
+    }
+
+    @Test
+    public void testUploadPackagesShouldReturn401OnTooShortParams() throws Exception {
+        MockMultipartFile packageFile = new MockMultipartFile("package", "lib.tar.gz", "application/gzip", inputStream);
+        mockMvc.perform(multipart("/packages")
+                .file("file", packageFile.getBytes())
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .param("name", "na")
+                .param("description", "de")
+                .param("tagsString", "INVALID!testString")
+                .param("version", "0.1"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(content().string(containsString("name")))
+                .andExpect(content().string(containsString("The package name must be at least 3 and max 100 characters long")))
+                .andExpect(content().string(containsString("description")))
+                .andExpect(content().string(containsString("The description must be at least 3 and max 500 characters long")))
+                .andExpect(content().string(containsString("tagsString")))
+                .andExpect(content().string(containsString("The tag should contain only lowercase alphanumeric characters and underscores")))
                 .andReturn();
     }
 }
