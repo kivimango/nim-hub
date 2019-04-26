@@ -17,9 +17,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import java.io.InputStream;
 import static com.kivimango.nimhub.util.TestData.*;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
@@ -66,6 +68,24 @@ public class PackageControllerTest {
                 .andExpect(jsonPath("$.version", is(version)))
                 .andExpect(jsonPath("$.hidden", is(false)))
                 .andExpect(jsonPath("$.owner.username", is(dto.getOwner().getUsername())))
+                .andReturn();
+    }
+
+    @Test
+    public void testUploadPackageShouldReturn401OnMandatoryFieldsOmittedValuesWithErrorMessages() throws Exception {
+        mockMvc.perform(post("/packages")
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$", hasSize(4)))
+                .andExpect(content().string(containsString("file")))
+                .andExpect(content().string(containsString("You must supply a package file")))
+                .andExpect(content().string(containsString("name")))
+                .andExpect(content().string(containsString("You must supply a package name")))
+                .andExpect(content().string(containsString("description")))
+                .andExpect(content().string(containsString("You must supply a package description")))
+                .andExpect(content().string(containsString("version")))
+                .andExpect(content().string(containsString("You must supply a package version")))
                 .andReturn();
     }
 }
