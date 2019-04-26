@@ -1,6 +1,8 @@
 package com.kivimango.nimhub.rest;
 
 import com.kivimango.nimhub.data.PackageUploadRequest;
+import org.springframework.web.multipart.MultipartFile;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -29,8 +31,8 @@ final class PackageUploadForm implements PackageUploadRequest {
     @Size(min = 1, max = 50, message = "The package version must be at least {min} and max {max} characters long")
     private String version;
 
-    /*@NotNull(message = "You must supply a package archive")
-    private MultipartFile file;*/
+    @NotNull(message = "You must supply a package file")
+    private MultipartFile file;
 
     public String getName() {
         return name;
@@ -80,11 +82,11 @@ final class PackageUploadForm implements PackageUploadRequest {
         this.version = version;
     }
 
-    /*public MultipartFile getFile() {
+    public MultipartFile getFile() {
         return file;
     }
 
     public void setFile(MultipartFile file) {
         this.file = file;
-    }*/
+    }
 }
