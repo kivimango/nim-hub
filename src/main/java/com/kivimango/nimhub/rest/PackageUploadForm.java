@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 final class PackageUploadForm implements PackageUploadRequest {
 
     @NotNull(message = "You must supply a package name")
-    @Size(min = 3, max = 100)
+    @Size(min = 3, max = 100, message = "The package name must be at least {min} and max {max} characters long")
     @Pattern(regexp = "^[a-z0-9-_]+$", message = "The name should only contain lowercase alphanumeric characters and underscores")
     private String name;
 
