@@ -31,7 +31,7 @@ final class PackageStoreProperties {
         if(path == null || path.isEmpty()) {
             log.info("Package storage path from application.properties is null, fallback to default...");
         } else {
-            this.storageDir = storageDir;
+            this.storageDir = path;
             log.info("Package storage path set to {}", path);
         }
     }
