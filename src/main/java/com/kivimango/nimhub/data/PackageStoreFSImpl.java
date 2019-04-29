@@ -3,6 +3,8 @@ package com.kivimango.nimhub.data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,6 +29,14 @@ class PackageStoreFSImpl implements PackageStore {
         if(!Files.exists(libDir)) Files.createDirectory(libDir);
         Files.write(target, bytes);
         log.debug("New package file successfully stored under {}", target);
+    }
+
+    @Override
+    public String get(Package pack) throws ResourceNotFoundException {
+        Path path = Paths.get(storePath.resolve(pack.getName()) + File.separator + pack.getName() + "-" + pack.getVersion() + ".tar.gz");
+        if(Files.exists(path)) {
+            return path.toString();
+        } else throw new ResourceNotFoundException("The requested resource {} could not be found", pack.getId());
     }
 
     private void checkStoragePath() {
