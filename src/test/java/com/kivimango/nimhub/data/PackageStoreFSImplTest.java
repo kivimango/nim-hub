@@ -12,8 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 public class PackageStoreFSImplTest {
@@ -21,6 +20,7 @@ public class PackageStoreFSImplTest {
     private PackageStoreProperties properties = createProperties();
     private PackageStore store = new PackageStoreFSImpl(properties);
     private InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("lib.tar.gz");
+    private Package lib = createPackage();
 
     @Test
     public void testPutShouldCreateFileInStorageDirectory() throws IOException {
@@ -38,6 +38,36 @@ public class PackageStoreFSImplTest {
         cleanup();
     }
 
+    @Test
+    public void testGetShouldReturnStoredFilePath() throws Exception {
+        MockMultipartFile packageFile = new MockMultipartFile("package", "lib.tar.gz", "application/gzip", inputStream);
+        store.put(lib, packageFile.getBytes());
+
+        String expected = properties.getStorageDir() + lib.getName() + File.separator + lib.getName() + "-" + lib.getVersion() + ".tar.gz";
+        String actual = store.get(lib);
+        System.out.println(actual);
+        assertEquals(expected, actual);
+
+        cleanup();
+    }
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void testGetShouldThrowExceptionOnNonExistentFile() throws Exception {
+        Package nonExistent = new Package();
+        nonExistent.setId(23L);
+        nonExistent.setName("non-existent");
+        nonExistent.setVersion("0.1-alpha");
+        store.get(nonExistent);
+    }
+
+    private Package createPackage() {
+        Package lib = new Package();
+        lib.setId(1L);
+        lib.setName("test-lib");
+        lib.setVersion("1.0-STABLE");
+        return lib;
+    }
+
     private void cleanup() {
         File f = new File(properties.getStorageDir());
         File[] files = f.listFiles();
@@ -48,8 +78,19 @@ public class PackageStoreFSImplTest {
     }
 
     private PackageStoreProperties createProperties() {
+        System.out.println("called");
         PackageStoreProperties props = new PackageStoreProperties();
-        String pathStr = System.getProperty("java.io.tmpdir") + File.separator + "aspaci" + File.separator;
+        String pathStr = System.getProperty("java.io.tmpdir") + "nim-hub" + File.separator;
+        System.out.println(pathStr);
+        Path path = Paths.get(pathStr);
+
+        if(!Files.exists(path))
+            try {
+                Files.createDirectory(path);
+            } catch (IOException e) {
+               e.printStackTrace();
+            }
+
         props.setStorageDir(pathStr);
         return props;
     }
