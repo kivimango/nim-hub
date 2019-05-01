@@ -11,16 +11,21 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.ResourceUtils;
+
 import java.io.InputStream;
 import static com.kivimango.nimhub.util.TestData.*;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertArrayEquals;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
@@ -109,4 +114,18 @@ public class PackageControllerTest {
                 .andExpect(content().string(containsString("The tag should contain only lowercase alphanumeric characters and underscores")))
                 .andReturn();
     }
+
+    @Test
+    public void testDownloadShouldReturn200WithGzipFile() throws Exception {
+        MockMultipartFile packageFile = new MockMultipartFile("package", "lib.tar.gz", "application/gzip", inputStream);
+        String testLibPath = ResourceUtils.getFile(this.getClass().getResource("/lib.tar.gz")).getPath();
+        given(packages.get("lib-test", "1.0-FINAL")).willReturn(testLibPath);
+        MockHttpServletResponse response = mockMvc.perform(get("/packages/lib-test/1.0-FINAL"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/gzip"))
+                .andReturn().getResponse();
+
+        assertArrayEquals(packageFile.getBytes(), response.getContentAsByteArray());
+    }
+
 }
