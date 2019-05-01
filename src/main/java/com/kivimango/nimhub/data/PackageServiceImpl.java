@@ -33,6 +33,16 @@ class PackageServiceImpl implements PackageService {
         return PackageDto.of(saved);
     }
 
+    @Override
+    public String get(String libName, String version) throws ResourceNotFoundException {
+        Objects.requireNonNull(libName, version);
+        Optional<Package> entity = repository.findByNameAndVersion(libName, version);
+        if(entity.isPresent()) {
+            return storage.get(entity.get());
+        }
+        throw new ResourceNotFoundException("The requested resource ("+ libName + "-" + version + ") could not be found", libName + "-" + version);
+    }
+
     private Package getEntityFromForm(PackageUploadRequest form, String username) {
         Package newPack = new Package();
         newPack.setName(form.getName());
