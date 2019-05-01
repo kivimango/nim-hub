@@ -36,7 +36,7 @@ class PackageStoreFSImpl implements PackageStore {
         Path path = Paths.get(storePath.resolve(pack.getName()) + File.separator + pack.getName() + "-" + pack.getVersion() + ".tar.gz");
         if(Files.exists(path)) {
             return path.toString();
-        } else throw new ResourceNotFoundException("The requested resource {} could not be found", pack.getId());
+        } else throw new ResourceNotFoundException("The requested resource could not be found", pack.getName() + pack.getVersion());
     }
 
     private void checkStoragePath() {
