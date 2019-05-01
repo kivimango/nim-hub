@@ -43,9 +43,8 @@ public class PackageStoreFSImplTest {
         MockMultipartFile packageFile = new MockMultipartFile("package", "lib.tar.gz", "application/gzip", inputStream);
         store.put(lib, packageFile.getBytes());
 
-        String expected = properties.getStorageDir() + lib.getName() + File.separator + lib.getName() + "-" + lib.getVersion() + ".tar.gz";
+        String expected = Paths.get(properties.getStorageDir()).resolve(lib.getName()).resolve(lib.getName() + "-" + lib.getVersion() + ".tar.gz").toString();
         String actual = store.get(lib);
-        System.out.println(actual);
         assertEquals(expected, actual);
 
         cleanup();
@@ -78,11 +77,10 @@ public class PackageStoreFSImplTest {
     }
 
     private PackageStoreProperties createProperties() {
-        System.out.println("called");
         PackageStoreProperties props = new PackageStoreProperties();
-        String pathStr = System.getProperty("java.io.tmpdir") + "nim-hub" + File.separator;
-        System.out.println(pathStr);
-        Path path = Paths.get(pathStr);
+        String pathStr = System.getProperty("java.io.tmpdir");
+        Path path = Paths.get(pathStr).resolve("nim-hub");
+        System.out.println(path);
 
         if(!Files.exists(path))
             try {
