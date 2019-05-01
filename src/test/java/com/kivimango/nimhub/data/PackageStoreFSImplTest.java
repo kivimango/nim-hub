@@ -30,7 +30,7 @@ public class PackageStoreFSImplTest {
         lib.setVersion("1.0-STABLE");
         store.put(lib, packageFile.getBytes());
 
-        Path savedFilePath = Paths.get(properties.getStorageDir() + lib.getName() + File.separator + lib.getName() + "-" + lib.getVersion() + ".tar.gz");
+        Path savedFilePath = Paths.get(properties.getStorageDir()).resolve(lib.getName()).resolve(lib.getName() + "-" + lib.getVersion() + ".tar.gz");
         byte[] savedContent = Files.readAllBytes(savedFilePath);
         assertTrue(Files.exists(savedFilePath));
         assertArrayEquals(packageFile.getBytes(), savedContent);
