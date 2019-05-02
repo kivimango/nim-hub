@@ -5,4 +5,5 @@ import java.io.IOException;
 public interface PackageStore {
     void put(Package pack, byte[] bytes) throws IOException;
     String get(Package pack) throws ResourceNotFoundException;
+    Boolean exists(String name, String version);
 }
