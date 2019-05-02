@@ -59,6 +59,21 @@ public class PackageStoreFSImplTest {
         store.get(nonExistent);
     }
 
+    @Test
+    public void testExistsShouldReturnTrueOnExistingFile() throws IOException {
+        MockMultipartFile packageFile = new MockMultipartFile("package", "lib-1.0-FINAL.tar.gz", "application/gzip", inputStream);
+        store.put(lib, packageFile.getBytes());
+
+        assertTrue(store.exists("test-lib", "1.0-STABLE"));
+
+        cleanup();
+    }
+
+    @Test
+    public void testExistsShouldReturnFalseOnNonExistingFile() {
+        assertFalse(store.exists("missing-lib", "0.0"));
+    }
+
     private Package createPackage() {
         Package lib = new Package();
         lib.setId(1L);
