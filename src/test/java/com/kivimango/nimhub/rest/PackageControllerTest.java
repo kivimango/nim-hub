@@ -117,6 +117,20 @@ public class PackageControllerTest {
     }
 
     @Test
+    public void testUploadShouldReturn400OnAlreadyExistingPackage() throws Exception {
+        MockMultipartFile packageFile = new MockMultipartFile("package", "lib-1.0-FINAL.tar.gz", "application/gzip", inputStream);
+        given(packages.isExists(Mockito.any(), Mockito.any())).willReturn(true);
+        given(repository.exists(Mockito.anyString(), Mockito.anyString())).willReturn(true);
+        mockMvc.perform(multipart("/packages")
+                .file("file", packageFile.getBytes())
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .param("name", packageName)
+                .param("description", description)
+                .param("version", "1.0-FINAL"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void testDownloadShouldReturn200WithGzipFile() throws Exception {
         MockMultipartFile packageFile = new MockMultipartFile("package", "lib-1.0-FINAL.tar.gz", "application/gzip", inputStream);
         String testLibPath = ResourceUtils.getFile(this.getClass().getResource("/lib-1.0-FINAL.tar.gz")).getPath();
