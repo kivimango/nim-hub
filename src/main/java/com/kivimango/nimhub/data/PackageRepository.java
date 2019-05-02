@@ -8,4 +8,5 @@ import java.util.Optional;
 @Repository
 public interface PackageRepository extends CrudRepository<Package, Long> {
     Optional<Package> findByNameAndVersion(String name, String version);
+    Boolean existsByNameAndVersion(String name, String version);
 }
