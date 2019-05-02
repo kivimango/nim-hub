@@ -18,6 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.ResourceUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import static com.kivimango.nimhub.util.TestData.*;
 import static org.hamcrest.Matchers.*;
@@ -46,11 +47,11 @@ public class PackageControllerTest {
     @MockBean
     private PackageService packages;
 
-    private InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("lib.tar.gz");
+    private InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("lib-1.0-FINAL.tar.gz");
 
     @Test
     public void testUploadPackageShouldReturn201() throws Exception {
-        MockMultipartFile packageFile = new MockMultipartFile("package", "lib.tar.gz", "application/gzip", inputStream);
+        MockMultipartFile packageFile = new MockMultipartFile("package", "lib-1.0-FINAL.tar.gz", "application/gzip", inputStream);
         given(packages.save(Mockito.any(), Mockito.any(), Mockito.any())).willReturn(TestData.dto);
 
         mockMvc.perform(multipart("/packages")
@@ -95,7 +96,7 @@ public class PackageControllerTest {
 
     @Test
     public void testUploadPackagesShouldReturn401OnTooShortParams() throws Exception {
-        MockMultipartFile packageFile = new MockMultipartFile("package", "lib.tar.gz", "application/gzip", inputStream);
+        MockMultipartFile packageFile = new MockMultipartFile("package", "lib-1.0-FINAL.tar.gz", "application/gzip", inputStream);
         mockMvc.perform(multipart("/packages")
                 .file("file", packageFile.getBytes())
                 .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -117,8 +118,8 @@ public class PackageControllerTest {
 
     @Test
     public void testDownloadShouldReturn200WithGzipFile() throws Exception {
-        MockMultipartFile packageFile = new MockMultipartFile("package", "lib.tar.gz", "application/gzip", inputStream);
-        String testLibPath = ResourceUtils.getFile(this.getClass().getResource("/lib.tar.gz")).getPath();
+        MockMultipartFile packageFile = new MockMultipartFile("package", "lib-1.0-FINAL.tar.gz", "application/gzip", inputStream);
+        String testLibPath = ResourceUtils.getFile(this.getClass().getResource("/lib-1.0-FINAL.tar.gz")).getPath();
         given(packages.get("lib-test", "1.0-FINAL")).willReturn(testLibPath);
         MockHttpServletResponse response = mockMvc.perform(get("/packages/lib-test/1.0-FINAL"))
                 .andExpect(status().isOk())

@@ -19,12 +19,12 @@ public class PackageStoreFSImplTest {
 
     private PackageStoreProperties properties = createProperties();
     private PackageStore store = new PackageStoreFSImpl(properties);
-    private InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("lib.tar.gz");
+    private InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("lib-1.0-FINAL.tar.gz");
     private Package lib = createPackage();
 
     @Test
     public void testPutShouldCreateFileInStorageDirectory() throws IOException {
-        MockMultipartFile packageFile = new MockMultipartFile("package", "lib.tar.gz", "application/gzip", inputStream);
+        MockMultipartFile packageFile = new MockMultipartFile("package", "lib-1.0-FINAL.tar.gz", "application/gzip", inputStream);
         Package lib = new Package();
         lib.setName("test-lib");
         lib.setVersion("1.0-STABLE");
@@ -40,7 +40,7 @@ public class PackageStoreFSImplTest {
 
     @Test
     public void testGetShouldReturnStoredFilePath() throws Exception {
-        MockMultipartFile packageFile = new MockMultipartFile("package", "lib.tar.gz", "application/gzip", inputStream);
+        MockMultipartFile packageFile = new MockMultipartFile("package", "lib-1.0-FINAL.tar.gz", "application/gzip", inputStream);
         store.put(lib, packageFile.getBytes());
 
         String expected = Paths.get(properties.getStorageDir()).resolve(lib.getName()).resolve(lib.getName() + "-" + lib.getVersion() + ".tar.gz").toString();
