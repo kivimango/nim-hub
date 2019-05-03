@@ -18,7 +18,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.ResourceUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
 import static com.kivimango.nimhub.util.TestData.*;
 import static org.hamcrest.Matchers.*;
@@ -77,7 +76,7 @@ public class PackageControllerTest {
     }
 
     @Test
-    public void testUploadPackageShouldReturn401OnMandatoryFieldsOmittedValuesWithErrorMessages() throws Exception {
+    public void testUploadPackageShouldReturn400OnMandatoryFieldsOmittedValuesWithErrorMessages() throws Exception {
         mockMvc.perform(multipart("/packages")
                 .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isBadRequest())
@@ -95,7 +94,7 @@ public class PackageControllerTest {
     }
 
     @Test
-    public void testUploadPackagesShouldReturn401OnTooShortParams() throws Exception {
+    public void testUploadPackagesShouldReturn400OnTooShortParams() throws Exception {
         MockMultipartFile packageFile = new MockMultipartFile("package", "lib-1.0-FINAL.tar.gz", "application/gzip", inputStream);
         mockMvc.perform(multipart("/packages")
                 .file("file", packageFile.getBytes())
@@ -117,7 +116,7 @@ public class PackageControllerTest {
     }
 
     @Test
-    public void testUploadShouldReturn400OnAlreadyExistingPackage() throws Exception {
+    public void testUploadShouldReturn409nAlreadyExistingPackage() throws Exception {
         MockMultipartFile packageFile = new MockMultipartFile("package", "lib-1.0-FINAL.tar.gz", "application/gzip", inputStream);
         given(packages.isExists(Mockito.any(), Mockito.any())).willReturn(true);
         given(repository.exists(Mockito.anyString(), Mockito.anyString())).willReturn(true);
@@ -127,7 +126,7 @@ public class PackageControllerTest {
                 .param("name", packageName)
                 .param("description", description)
                 .param("version", "1.0-FINAL"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isConflict());
     }
 
     @Test
