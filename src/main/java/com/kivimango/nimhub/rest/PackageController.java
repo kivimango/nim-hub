@@ -47,10 +47,14 @@ final class PackageController {
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping(value = "/packages", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ResponseEntity<PackageDto> uploadPackage(@Valid PackageUploadForm form, Principal principal) throws IOException {
-        PackageDto saved = packages.save(form, form.getFile().getBytes(), principal.getName());
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/" + saved.getName()).buildAndExpand().toUri();
-        return created(location).body(saved);
+    ResponseEntity<PackageDto> uploadPackage(@Valid PackageUploadForm form, Principal principal) throws IOException, PackageAlreadyExistsException {
+        if(!packages.isExists(form.getName(), form.getVersion())) {
+            PackageDto saved = packages.save(form, form.getFile().getBytes(), principal.getName());
+            URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/" + saved.getName()).buildAndExpand().toUri();
+            return created(location).body(saved);
+        } else {
+            throw new PackageAlreadyExistsException(form.getName(), form.getVersion());
+        }
     }
 
     @ExceptionHandler(BindException.class)
@@ -67,6 +71,11 @@ final class PackageController {
     @ExceptionHandler({ResourceNotFoundException.class, IOException.class})
     ResponseEntity<String> resourceNotFound(Exception exc) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exc.getMessage());
+    }
+
+    @ExceptionHandler(PackageAlreadyExistsException.class)
+    ResponseEntity<String> handleAlreadyExists(PackageAlreadyExistsException pae) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(pae.getMessage());
     }
 
 }
