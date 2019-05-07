@@ -3,3 +3,8 @@ sudo: false
 language: java
 jdk:
 - openjdk8
+
+# cache between builds
+cache:
+  directories:
+  - $HOME/.m2
